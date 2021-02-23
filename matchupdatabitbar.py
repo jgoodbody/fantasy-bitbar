@@ -1,4 +1,4 @@
-#!/Library/Frameworks/Python.framework/Versions/3.8/bin/python3
+#!/usr/bin/python3
 
 from yahoo_oauth import OAuth2
 import yahoo_fantasy_api as yfa
@@ -7,7 +7,7 @@ import logging
 oauth_logger = logging.getLogger('yahoo_oauth')
 oauth_logger.disabled = True
 
-oauth = OAuth2(None, None, from_file='/Users/jgoodbody/fun/fantasy-bitbar/oauth.json')
+oauth = OAuth2(None, None, from_file='/home/joel/fun/yahoo/oauth2.json')
 
 if not oauth.token_is_valid():
     oauth.refresh_access_token()
@@ -17,7 +17,7 @@ class color:
    CYAN = '\033[96m'
    DARKCYAN = '\033[36m'
    BLUE = '\033[94m'
-   GREEN = '\033[92m'
+   GREEN = '\033[1;32m'
    YELLOW = '\033[93m'
    RED = '\033[1;31m'
    BOLD = '\033[1;30m'
@@ -39,30 +39,37 @@ for matchup in current_matchups:
                 opp_idx = '1' if i == 0 else '0'
                 matchup_idx = str(matchup)
 
-owner_points = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][1]['team_points']['total']
-owner_proj_points = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][1]['team_live_projected_points']['total']
+owner_team = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][0][2]['name']
+owner_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][1]['team_points']['total']
+owner_live_proj_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][1]['team_live_projected_points']['total']
+owner_orig_proj_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][team_idx]['team'][1]['team_projected_points']['total']
 
-opp_points = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][1]['team_points']['total']
-opp_proj_points = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][1]['team_live_projected_points']['total']
-
+opp_team = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][0][2]['name']
+opp_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][1]['team_points']['total']
+opp_live_proj_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][1]['team_live_projected_points']['total']
+opp_orig_proj_pts = current_matchups[matchup_idx]['matchup']['0']['teams'][opp_idx]['team'][1]['team_projected_points']['total']
 #print('You vs. opponent')
-if owner_points > opp_points:
-    print('{0} vs. {1}'.format(owner_points, opp_points))
+if float(owner_pts) > float(opp_pts):
+    print('{0} {1} vs. {2} {3}'.format(owner_team, owner_pts, opp_pts, opp_team))
 else:
-    print('{0} vs. {1}'.format(owner_points, opp_points))
+    print('{0} {1} vs. {2} {3}'.format(owner_team, owner_pts, opp_pts, opp_team))
 
 print('---')
+print('Projected Matchup')
+print('--Live: {0} vs. {1}'.format(owner_live_proj_pts, opp_live_proj_pts))
+print('--Orig: {0} vs. {1}'.format(owner_orig_proj_pts, opp_orig_proj_pts))
 
+print('Standings')
 for team in standings:
     if team['team_key'] == team_key:
-        print(color.BOLD + team['name'],'\t',
+        print('--' + color.BOLD + team['name'],'\t',
               team['outcome_totals']['wins'],'-',
               team['outcome_totals']['losses'],'-',
               team['outcome_totals']['ties'],'\t',
               team['points_for'],
              color.END)
     else:
-        print(team['name'],'\t',
+        print('--', team['name'],'\t',
               team['outcome_totals']['wins'],'-',
               team['outcome_totals']['losses'],'-',
               team['outcome_totals']['ties'],'\t',
